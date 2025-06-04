@@ -88,12 +88,17 @@ body{
     align-items: center;
     /* border: 2px solid red; */
     width: 90%;
- }
+}
 
- .main .content .content-header form{
+.input-form{
+    display: flex;
+    gap: 15px;
+}
+
+/* .main .content .content-header form{
     display: flex;
     gap: 50px;
-}
+} */
 
 #files-input{
     display: none;

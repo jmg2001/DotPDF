@@ -20,12 +20,14 @@ async def get_index(request: Request):
 @app.post("/merge")
 async def merge_pdfs(request: Request, files: list[UploadFile] = File(...)):
     file_paths = []
+    print(files)
     for file in files:
         file_path = os.path.join(UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         file_paths.append(file_path)
-    return templates.TemplateResponse("reorder.html", {"request": request, "files": file_paths})
+    return file_paths
+    # return templates.TemplateResponse("reorder.html", {"request": request, "files": file_paths})
 
 @app.post("/finalize")
 async def finalize_merge(request: Request, order: str = Form(...)):

@@ -1,75 +1,84 @@
 const filesInput = document.getElementById('files-input');
 const previewContainer = document.getElementById('canvas-area');
 const btnProcess = document.getElementById('btn-process');
-const fileReader = new FileReader();
 let pageCounter = 0;
+let fileCounter = 0;
 
-let pdfFile = null;
-let pdfDoc = null;
-
-fileReader.onload = async function () {
-    const typedarray = new Uint8Array(this.result);
-    pdfDoc = await pdfjsLib.getDocument({ data: typedarray }).promise;
-
-    previewContainer.innerHTML = ''; // Limpiar anteriores
-    for (let i = 1; i <= pdfDoc.numPages; i++) {
-        pageCounter++;
-        const page = await pdfDoc.getPage(i);
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        const viewport = page.getViewport({ scale: 0.4 });
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('page-preview');
-        wrapper.dataset.pageNumber = pageCounter;
-
-        // Agrega el número visible en la esquina
-        const numberLabel = document.createElement('div');
-        numberLabel.classList.add('page-preview-number');
-        numberLabel.innerText = `#${pageCounter}`;
-        wrapper.appendChild(numberLabel);
-
-        wrapper.appendChild(canvas);
-
-        previewContainer.appendChild(wrapper);
-    }
-
-    // Activar ordenamiento con SortableJS
-    Sortable.create(previewContainer, {
-        animation: 150
-    });
-};
+let filesArray = Array();
 
 // Cargar PDF y renderizar páginas
 filesInput.addEventListener('change', async (e) => {
 
-    for(let i = 0; i < e.target.files.length; i++){
-        let file = e.target.files[i];
-        console.log(file);
-        if (!file || file.type !== 'application/pdf') return;
+    if (pageCounter == 0) previewContainer.innerHTML = '';  // Limpiar previas anteriores
 
-        pdfFile = file;
+    const files = Array.from(filesInput.files);
 
-        fileReader.readAsArrayBuffer(file);
+    for (let i = 0; i < files.length; i++) {
+        fileCounter++;
+
+        const file = files[i];
+        filesArray.push(file);
+        // const label = document.createElement('h3');
+        // label.textContent = `Archivo ${i + 1}: ${file.name}`;
+        // previewContainer.appendChild(label);
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            pageCounter++;
+
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 0.3 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('page-preview');
+            wrapper.dataset.pageNumber = pageCounter;
+            wrapper.dataset.fileIndex = fileCounter;
+
+            const numberLabel = document.createElement('div');
+            numberLabel.classList.add('page-preview-number');
+            numberLabel.innerText = `#${pageCounter}`;
+            wrapper.appendChild(numberLabel);
+            wrapper.appendChild(canvas);
+
+            previewContainer.appendChild(wrapper);
+        }
     }
 
-    pageCounter = 0;
-    
+    // Habilitar drag & drop
+    new Sortable(previewContainer, {
+        animation: 150,
+        ghostClass: 'dragging'
+    });
 });
 
 // Enviar al backend
 btnProcess.addEventListener('click', async () => {
-    if (!pdfFile) return alert('Primero carga un archivo PDF.');
+
+    if (pageCounter == 0) return alert('Primero carga un archivo PDF.');
+
+    pageCounter = 0;
+    fileCounter = 0;
 
     const pageOrder = Array.from(document.querySelectorAll('.page-preview'))
         .map(div => parseInt(div.dataset.pageNumber));
 
+    console.log(filesArray);
+    console.log(pageOrder);
+
     const formData = new FormData();
-    formData.append('file', pdfFile);
+
+    for(let i = 0; i < filesArray.length; i++){
+        formData.append('files', filesArray[i]);
+    }
+
     formData.append('order', JSON.stringify(pageOrder));
 
     const response = await fetch('/merge', {
@@ -84,4 +93,7 @@ btnProcess.addEventListener('click', async () => {
     } else {
         alert('Error al unir el PDF.');
     }
+
+    previewContainer.innerHTML = ''
+    files = new Array();
 });
