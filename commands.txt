@@ -1,4 +1,1 @@
-pip install fastapi uvicorn pypdf jinja2
-
 uvicorn main:app --reload
-
