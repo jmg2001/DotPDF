@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reordenar páginas</title>
+    
+</head>
+<body>
+    <h2>Reordena las páginas</h2>
+    <form id="orderForm" action="/finalize" method="post">
+        <div id="pageList"></div>
+        <input type="hidden" name="order" id="orderInput">
+        <button type="submit">Unir PDFs</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        const files = JSON.parse('{{ files | safe }}');
+        const pageList = document.getElementById("pageList");
+        const orderInput = document.getElementById("orderInput");
+
+        async function getPageCount(file) {
+            const response = await fetch(file);
+            const blob = await response.blob();
+            const arrayBuffer = await blob.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            for (let i = 0; i < pdf.numPages; i++) {
+                const div = document.createElement("div");
+                div.textContent = `Archivo: ${file} - Página: ${i}`;
+                div.setAttribute("data-item", JSON.stringify([file, i]));
+                div.style.border = "1px solid black";
+                div.style.margin = "4px";
+                div.style.padding = "4px";
+                pageList.appendChild(div);
+            }
+        }
+
+        files.forEach(getPageCount);
+
+        new Sortable(pageList, { animation: 150 });
+
+        document.getElementById("orderForm").addEventListener("submit", () => {
+            const order = Array.from(pageList.children).map(div => JSON.parse(div.getAttribute("data-item")));
+            orderInput.value = JSON.stringify(order);
+        });
+    </script>
+</body>
+</html>
