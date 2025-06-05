@@ -18,7 +18,29 @@
 
     <main>
         <section class="main">
-            <div class="content">
+            <section class="upload-organizer" id="upload-organizer">
+                <h1>Organiza archivos PDF</h1>
+                <h3>¡Organiza archivos pdf de forma sencilla y rápida!</h3>
+                <div class="input-form">
+                    <form>
+                        <label for="files-input" id="files-label">Subir Archivos</label>
+                        <input type="file" id="files-input" name="files" accept="application/pdf" multiple required>
+                    </form>
+                </div>
+            </section>
+
+            <section class="editor-section hidden" id="editor">
+                <aside id="sidebar">
+                    <button class="btn-add-more" id="btn-add-more">+</button>
+                    <button class="btn-process" id="btn-process">Procesar</button>
+                </aside>
+                <div class="canvas-area" id="canvas-area">
+                <!-- Aquí se dibujarán los previews -->
+                </div>
+            </section>
+
+
+            <!-- <div class="content">
                 <div class="content-header">
                     <h2>Selecciona archivos PDF</h2>
                     <div class="input-form">
@@ -31,7 +53,7 @@
                 </div>
                 <div class="canvas-area" id="canvas-area">
                 </div>
-            </div>
+            </div> -->
         </section>
     </main>
     
@@ -42,5 +64,4 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <script src="/static/script.js"></script>
-</body>
 </html>

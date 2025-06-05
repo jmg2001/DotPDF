@@ -23,6 +23,14 @@ body{
     background: var(--second-bg-color);
 }
 
+button{
+    box-shadow: 0 0 10px gray;
+}
+
+label{
+    box-shadow: 0 0 10px gray;
+}
+
 /**========================================================================
  *                           HEADER
  *========================================================================**/
@@ -32,11 +40,13 @@ body{
     padding: 1rem 10%;
     display: flex;
     align-items: center;
+    position: relative;
     justify-content: space-between;
     background: var(--bg-color);
     height: 10vh;
     color: var(--secondary-color);
     box-shadow: 0 0 10px gray;
+    z-index: 10;
 }
 
 .navbar{
@@ -66,7 +76,7 @@ body{
  *========================================================================**/
 
 .main{
-    margin: 0 10%;
+    margin: 0;
     display: flex;
     flex-direction: column;
     height: 90vh;
@@ -100,21 +110,26 @@ body{
 }
 
 #files-label{
-    display: block;
+    display: flex;
     background: var(--secondary-color);
     padding: 10px;
     color: white;
     font-weight: 600;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 1.7rem;
     transition: 0.3s ease;
+    width: 20rem;
+    height: 5rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
 }
 
 #files-label:hover{
     background: var(--main-color);
 }
 
-.main .content .content-header button{
+.btn-process{
     background: var(--secondary-color);
     padding: 10px;
     color: white;
@@ -122,9 +137,27 @@ body{
     border-radius: 4px;
     font-size: 1rem;
     transition: 0.3s ease;
+    width: 100%;
 }
 
-.main .content .content-header button:hover{
+.btn-add-more{
+    /* width: fit-content; */
+    width: 4rem;
+    height: 4rem;
+    align-items: center;
+    justify-content: center;
+    display: flex; 
+    background: var(--secondary-color);
+    padding: 10px;
+    color: white;
+    font-weight: 600;
+    border-radius: 50%;
+    font-size: 3rem;
+    transition: 0.3s ease;
+}
+
+.btn-process:hover,
+.btn-add-more:hover{
     background: var(--main-color);
 }
 
@@ -170,9 +203,75 @@ body{
 }
 
 /**========================================================================
+ *                           ADDING
+ *========================================================================**/
+
+.upload-organizer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 0.7rem;
+}
+
+.upload-organizer h1{
+    font-size: 3rem;
+    font-size: 700;
+}
+
+.upload-organizer h3{
+    font-size: 1.2rem;
+    color: rgba(0, 0, 0, 0.425);
+    font-size: 700;
+}
+
+.canvas-area {
+    padding: 2%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 85vw;
+    height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: rgba(12, 86, 146,15%);
+}
+
+.canvas-area::-webkit-scrollbar{
+    display: none;
+}
+
+aside {
+    position: fixed;
+    padding-top: 10vh;
+    padding-left: 20px;
+    padding-right: 20px;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 15vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    background: var(--bg-color);
+    box-shadow: 0 0 10px gray;
+    z-index: 1;
+    align-items: center;
+}
+
+/**========================================================================
  *                           RESPONSIVE
  *========================================================================**/
 
 @media(max-width:895px){
     
+}
+
+/**========================================================================
+ *                           STATES
+ *========================================================================**/
+
+.hidden {
+  display: none;
 }

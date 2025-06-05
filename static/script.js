@@ -27,6 +27,10 @@ async function getSessionId() {
     }
 }
 
+document.getElementById('btn-add-more').addEventListener('click', () => {
+    document.getElementById('files-input').click();
+});
+
 
 // Cargar PDF y renderizar páginas
 filesInput.addEventListener('change', async (e) => {
@@ -35,7 +39,14 @@ filesInput.addEventListener('change', async (e) => {
 
     const files = Array.from(filesInput.files);
 
-    console.log(files);
+    if (files.length > 0){
+        // Mostrar el canvas y el aside
+        document.getElementById('upload-organizer').classList.add('hidden');
+        document.getElementById('editor').classList.remove('hidden');
+    }else{
+        alert("No Files Selected");
+        return
+    }
 
     for (let i = 0; i < files.length; i++) {
         fileCounter++;
@@ -76,6 +87,7 @@ filesInput.addEventListener('change', async (e) => {
     // Habilitar drag & drop
     new Sortable(previewContainer, {
         animation: 150,
+        swapThreshold: 0.30,
         ghostClass: 'dragging'
     });
 });
