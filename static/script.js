@@ -6,6 +6,28 @@ let fileCounter = 0;
 
 let filesArray = Array();
 
+let sessionId = null;
+
+// Llama esta función cuando cargue la página
+window.onload = getSessionId;
+
+async function getSessionId() {
+    try {
+        const response = await fetch('/session');
+        const data = await response.json();
+        sessionId = data.session_id;
+
+        // También puedes guardarlo en localStorage si quieres persistencia entre recargas
+        localStorage.setItem('session_id', sessionId);
+
+        console.log("Session ID:", sessionId);
+    } catch (err) {
+        console.error("Error obtaining session ID:", err);
+        sessionId = -1;
+    }
+}
+
+
 // Cargar PDF y renderizar páginas
 filesInput.addEventListener('change', async (e) => {
 
@@ -13,14 +35,13 @@ filesInput.addEventListener('change', async (e) => {
 
     const files = Array.from(filesInput.files);
 
+    console.log(files);
+
     for (let i = 0; i < files.length; i++) {
         fileCounter++;
 
         const file = files[i];
         filesArray.push(file);
-        // const label = document.createElement('h3');
-        // label.textContent = `Archivo ${i + 1}: ${file.name}`;
-        // previewContainer.appendChild(label);
 
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -44,7 +65,7 @@ filesInput.addEventListener('change', async (e) => {
 
             const numberLabel = document.createElement('div');
             numberLabel.classList.add('page-preview-number');
-            numberLabel.innerText = `#${pageCounter}`;
+            numberLabel.innerText = `${pageCounter}`;
             wrapper.appendChild(numberLabel);
             wrapper.appendChild(canvas);
 
@@ -80,20 +101,38 @@ btnProcess.addEventListener('click', async () => {
     }
 
     formData.append('order', JSON.stringify(pageOrder));
+    formData.append('session_id',sessionId);
 
-    const response = await fetch('/merge', {
-        method: 'POST',
-        body: formData
+    fetch("/organize", {
+        method: "POST",
+        body: formData,  // Tu FormData con los datos necesarios
+    })
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "res.pdf";  // Nombre del archivo
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        // Reiniciar archivos e interfaz
+        filesInput.value = "";
+        previewContainer.innerHTML = ''
+        files = new Array();
+    })
+    .catch(error => {
+        console.error("Download Error:", error);
+        alert("Hubo un error al descargar el archivo PDF. Por favor, inténtalo de nuevo.");
     });
 
-    if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-    } else {
-        alert('Error al unir el PDF.');
-    }
-
-    previewContainer.innerHTML = ''
-    files = new Array();
+    // filesInput.
+    
 });

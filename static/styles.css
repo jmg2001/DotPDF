@@ -95,11 +95,6 @@ body{
     gap: 15px;
 }
 
-/* .main .content .content-header form{
-    display: flex;
-    gap: 50px;
-} */
-
 #files-input{
     display: none;
 }
@@ -162,12 +157,22 @@ body{
 
 .page-preview-number {
     position: absolute;
+    text-align: center;
+    width: 18px;
     top: 5px;
     left: 5px;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--secondary-color);
     color: white;
     font-size: 14px;
     padding: 2px 4px;
     border-radius: 3px;
     z-index: 1;
+}
+
+/**========================================================================
+ *                           RESPONSIVE
+ *========================================================================**/
+
+@media(max-width:895px){
+    
 }
